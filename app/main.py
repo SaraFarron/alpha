@@ -1,13 +1,19 @@
-from fastapi import FastAPI
-import databases
-import os
-from database import SessionLocal, engine
+from fastapi import FastAPI, Depends
+from database import engine, database, SessionLocal
+from sqlalchemy.orm import Session
 import models
-import schemas
+import crud
 
-database = databases.Database(os.environ.get('DATABASE_URL', "postgresql://postgres:postgres@postgresserver/db"))
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @app.on_event("startup")
@@ -21,4 +27,10 @@ async def shutdown():
 
 
 @app.get('/')
-async def root(): return {'message': 'Hello World!'}
+async def root(): return {'response': 'Hello World!'}
+
+
+@app.get('/products')
+async def read_products(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    products = crud.get_products(db, skip=skip, limit=limit)
+    return products

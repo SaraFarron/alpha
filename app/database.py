@@ -1,14 +1,12 @@
-import os
+import databases
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
-SQLALCHEMY_DATABASE_URL = os.environ.get('DATABASE_URL', "postgresql://postgres:postgres@postgresserver/db")
+DATABASE_URL = 'postgresql://postgres:postgres@db:5432/db'
+database = databases.Database(DATABASE_URL)
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, pool_size=3, max_overflow=0
-)
+    DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
