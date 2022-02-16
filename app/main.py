@@ -3,9 +3,11 @@ from database import engine, database, SessionLocal
 from sqlalchemy.orm import Session
 import models
 import crud
+import routers
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+app.include_router(routers.router)
 
 
 def get_db():

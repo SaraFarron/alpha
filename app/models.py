@@ -3,21 +3,21 @@ from database import Base
 from sqlalchemy.orm import relationship
 
 
-class BaseIndex(Base):
+class BaseIndex:
     id = Column(Integer, primary_key=True, index=True)
 
 
-class BaseName(Base):
+class BaseName:
     name = Column(String)
 
 
-class Product(BaseIndex, BaseName):
+class Product(BaseIndex, BaseName, Base):
     __tablename__ = 'products'
 
     current_volume = Column(Float)
 
 
-class Batch(BaseIndex):
+class Batch(BaseIndex, Base):
     __tablename__ = 'batches'
 
     product = Column(Integer, ForeignKey('products.id'))
@@ -31,17 +31,17 @@ class Batch(BaseIndex):
     received_shift = Column(String)
 
 
-class Tank(BaseIndex, BaseName):
+class Tank(BaseIndex, Base, BaseName):
     __tablename__ = 'tanks'
 
     capacity = Column(Float)
 
 
-class Supplier(BaseIndex, BaseName):
+class Supplier(BaseIndex, Base, BaseName):
     __tablename__ = 'suppliers'
 
 
-class Employee(BaseIndex):
+class Employee(BaseIndex, Base):
     __tablename__ = 'employees'
 
     full_name = Column(String)
@@ -52,7 +52,7 @@ class Employee(BaseIndex):
     date_of_birth = Column(Date)
 
 
-class Trade(BaseIndex):
+class Trade(BaseIndex, Base):
     __tablename__ = 'trades'
 
     total = Column(Float)
@@ -66,7 +66,7 @@ shift_employee = Table('shift_employee', Base.metadata,
                        )
 
 
-class Shift(BaseIndex):
+class Shift(BaseIndex, Base):
     __tablename__ = 'shifts'
 
     employees = relationship('Employee', secondary='shift_employee', back_populates='shifts')

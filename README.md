@@ -60,3 +60,10 @@ First attempt at fast api
 
 Можно использовать любые готовые python пакеты, единственное, что обязательно - Django 2.2.
 Требуется реализовать только админку, API и скрипт генератора продаж.
+
+
+Lookup:
+
+[crudrouter](https://fastapi-crudrouter.awtkns.com/routing)
+
+[crudrouter tutorial](https://www.youtube.com/watch?v=0xIe2qGZdiM)
