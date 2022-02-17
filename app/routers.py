@@ -1,23 +1,35 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from crud import get_all, get_instance
+from models import Batch, Product
+from database import SessionLocal
 
 router = APIRouter(
     responses={404: {'description': 'Not Found'}},
 )
 
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @router.post('/close-shift')
-async def close_shift(shift_id: int):
+async def close_shift(shift_id: int, db: Depends(get_db)):
     pass
 
 
 @router.get('/receive-batch')
-async def receive_batch(batch_id: int):
-    pass
+async def receive_batch(batch_id: int, db: Depends(get_db)):
+    batch = get_instance(db, Batch, batch_id)
 
 
 @router.get('/products')
-async def get_products():
-    pass
+async def get_products(db: Depends(get_db)):
+    products = get_all(db, Product)
+    return products
 
 
 @router.get('/batches')
