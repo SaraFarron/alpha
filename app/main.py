@@ -1,13 +1,12 @@
 from fastapi import FastAPI, Depends
-from database import engine, database, SessionLocal
 from sqlalchemy.orm import Session
-import models
-import crud
-import routers
+from database import SessionLocal, engine
+from routers import router
+from models import Base
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
-app.include_router(routers.router)
+app.include_router(router)
 
 
 def get_db():
@@ -16,23 +15,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
-
-
-@app.get('/')
-async def root(): return {'response': 'Hello World!'}
-
-
-@app.get('/products')
-async def read_products(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    products = crud.get_products(db, skip=skip, limit=limit)
-    return products

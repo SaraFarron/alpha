@@ -25,6 +25,3 @@ tomli==2.0.1
 typing_extensions==4.1.0
 urllib3==1.26.8
 uvicorn==0.17.4
-psycopg2-binary==2.9.3
-asyncpg==0.25.0
-databases==0.5.5
