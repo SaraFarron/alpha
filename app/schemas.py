@@ -9,5 +9,5 @@ class Employee(Index, BaseModel):
     name: str
 
 
-class EmployeeCreate(Employee):
-    pass
+class EmployeeCreate(BaseModel):
+    name: str

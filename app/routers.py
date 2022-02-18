@@ -39,4 +39,6 @@ async def create_employee(employee: schemas.EmployeeCreate, db: Session = Depend
     db_employee = crud.get_employee(db, 100)
     if db_employee:
         raise HTTPException(400, detail='Employee already exists')
-    return crud.new_employee(db, employee)
+    response = crud.new_employee(db, employee)
+    print('\n', response)
+    return {'status': 200}
