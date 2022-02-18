@@ -7,3 +7,7 @@ class Index:
 
 class Employee(Index, BaseModel):
     name: str
+
+
+class EmployeeCreate(Employee):
+    pass
