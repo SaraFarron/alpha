@@ -36,10 +36,19 @@ async def read_employee(employee_id: int, db: Session = Depends(get_db)):
 
 @router.post('/employees', tags=['employees'], response_model=schemas.Employee)
 async def create_employee(employee: schemas.EmployeeCreate, db: Session = Depends(get_db)) -> schemas.Employee:
-    db_employee = crud.get_employee(db, 100)
+    db_employee = crud.get_employee_by_name(db, employee.name)
     if db_employee:
         raise HTTPException(400, detail='Employee already exists')
     response = crud.new_employee(db, employee)
 
     # pydantic requires response to be a dictionary
     return response.__dict__
+
+
+@router.delete('/employee/{employee_id}', tags=['employees'], status_code=204)
+async def delete_employee(employee_id: int, employee: schemas.EmployeeDelete, db: Session = Depends(get_db)):
+    db_employee = crud.get_employee(db, employee_id)
+    if not db_employee:
+        raise HTTPException(404, detail='Employee does not exists')
+    crud.delete_employee(db, employee)
+    return {}

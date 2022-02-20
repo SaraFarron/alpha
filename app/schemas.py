@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class Index:
+class Index(BaseModel):
     id: int
 
 
@@ -11,3 +11,7 @@ class Employee(Index, BaseModel):
 
 class EmployeeCreate(BaseModel):
     name: str
+
+
+class EmployeeDelete(Index, BaseModel):
+    pass
