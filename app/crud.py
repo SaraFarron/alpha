@@ -25,9 +25,20 @@ def new_employee(db: Session, employee: schemas.EmployeeCreate):
 
 
 def delete_employee(db: Session, employee: schemas.EmployeeDelete):
-    print(employee.id, 'this is it')
     db_employee = models.Employee(id=employee.id)
     db.delete(db_employee)
     db.commit()
     db.refresh(db_employee)
     return db_employee
+
+
+def get_tasks(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Task).offset(skip).limit(limit).all()
+
+
+def create_employee_task(db: Session, task: schemas.TaskCreate, employee_id: int):
+    db_task = models.Task(**task.dict(), employee_id=employee_id)
+    db.add(db_task)
+    db.commit()
+    db.refresh(db_task)
+    return db_task

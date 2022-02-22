@@ -52,3 +52,16 @@ async def delete_employee(employee_id: int, employee: schemas.EmployeeDelete, db
         raise HTTPException(404, detail='Employee does not exists')
     crud.delete_employee(db, employee)
     return {}
+
+
+@router.post("/employees/{employee_id}/tasks/", response_model=schemas.Task, tags=['tasks'])
+async def create_task_for_employee(
+    employee_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db)
+):
+    return crud.create_employee_task(db=db, task=task, employee_id=employee_id)
+
+
+@router.get("/tasks/", response_model=list[schemas.Task], tags=['tasks'])
+async def read_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    tasks = crud.get_tasks(db, skip=skip, limit=limit)
+    return tasks
