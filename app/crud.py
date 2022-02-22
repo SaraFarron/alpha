@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 
 import models
 import schemas
@@ -24,12 +25,14 @@ def new_employee(db: Session, employee: schemas.EmployeeCreate):
     return db_employee
 
 
-def delete_employee(db: Session, employee: schemas.EmployeeDelete):
-    db_employee = models.Employee(id=employee.id)
-    db.delete(db_employee)
-    db.commit()
-    db.refresh(db_employee)
-    return db_employee
+def delete_employee(db: Session, employee_id: int):
+    db_employee = db.query(models.Employee).get(employee_id)
+    if db_employee:
+        db.delete(db_employee)
+        db.commit()
+    else:
+        raise HTTPException(404, detail=f'employee with id{employee_id} not found')
+    return
 
 
 def get_tasks(db: Session, skip: int = 0, limit: int = 100):

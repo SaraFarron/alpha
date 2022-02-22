@@ -46,12 +46,8 @@ async def create_employee(employee: schemas.EmployeeCreate, db: Session = Depend
 
 
 @router.delete('/employee/{employee_id}', tags=['employees'], status_code=204)
-async def delete_employee(employee_id: int, employee: schemas.EmployeeDelete, db: Session = Depends(get_db)):
-    db_employee = crud.get_employee(db, employee_id)
-    if not db_employee:
-        raise HTTPException(404, detail='Employee does not exists')
-    crud.delete_employee(db, employee)
-    return {}
+async def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+    return crud.delete_employee(db, employee_id)
 
 
 @router.post("/employees/{employee_id}/tasks/", response_model=schemas.Task, tags=['tasks'])
