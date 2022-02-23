@@ -12,3 +12,23 @@ Lookup:
 [crudrouter](https://fastapi-crudrouter.awtkns.com/routing)
 
 [crudrouter tutorial](https://www.youtube.com/watch?v=0xIe2qGZdiM)
+
+[alembic tutorial](https://www.youtube.com/watch?v=SdcH6IEi6nE)
+
+### Alembic commands:
+
+Init
+
+`docker exec -it alpha_web_1 alembic init alembic`
+
+Make migrations
+
+`docker exec -it alpha_web_1 alembic revision --autogenerate -m 'commit message'`
+
+Migrate to latest
+
+`docker exec -it alpha_web_1 alembic upgrade head`
+
+Migrate to previous
+
+`docker exec -it alpha_web_1 alembic downgrade -1`

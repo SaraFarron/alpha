@@ -18,3 +18,4 @@ class Task(Base, Index):
     title = Column(String, index=True)
     description = Column(String, index=True)
     employee_id = Column(Integer, ForeignKey('employees.id'))
+    status = Column(String, default='Open', index=True)
