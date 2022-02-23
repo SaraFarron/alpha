@@ -68,7 +68,7 @@ async def read_task(task_id: int, db: Session = Depends(get_db)):
     return crud.get_task(db, task_id)
 
 
-@router.patch('/task/{task_id}', response_model=schemas.Task, tags=['tasks'])
+@router.patch('/task/{task_id}', response_model=schemas.TaskUpdate, tags=['tasks'])
 async def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depends(get_db)):
     return crud.update_task(task_id, db, task)
 
