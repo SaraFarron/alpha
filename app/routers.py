@@ -46,11 +46,11 @@ async def create_employee(employee: schemas.EmployeeCreate, db: Session = Depend
 
 
 @router.delete('/employee/{employee_id}', tags=['employees'], status_code=204)
-async def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+async def destroy_employee(employee_id: int, db: Session = Depends(get_db)):
     return crud.delete_employee(db, employee_id)
 
 
-@router.post("/employees/{employee_id}/tasks/", response_model=schemas.Task, tags=['tasks'])
+@router.post("/employees/{employee_id}/task/", response_model=schemas.Task, tags=['tasks'])
 async def create_task_for_employee(
     employee_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db)
 ):
@@ -61,3 +61,18 @@ async def create_task_for_employee(
 async def read_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     tasks = crud.get_tasks(db, skip=skip, limit=limit)
     return tasks
+
+
+@router.get('/task/{task_id}', response_model=schemas.Task, tags=['tasks'])
+async def read_task(task_id: int, db: Session = Depends(get_db)):
+    return crud.get_task(db, task_id)
+
+
+@router.patch('/task/{task_id}', response_model=schemas.Task, tags=['tasks'])
+async def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depends(get_db)):
+    return crud.update_task(task_id, db, task)
+
+
+@router.delete('/tasks/{task_id}', tags=['tasks'])
+async def destroy_task(task_id: int, db: Session = Depends(get_db)):
+    return crud.delete_task(task_id, db)

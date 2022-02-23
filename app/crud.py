@@ -39,9 +39,35 @@ def get_tasks(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Task).offset(skip).limit(limit).all()
 
 
+def get_task(db: Session, id: int):
+    task = db.query(models.Task).get(id)
+    if task:
+        return task
+    else:
+        raise HTTPException(404, f'task with id {id} not found')
+
+
 def create_employee_task(db: Session, task: schemas.TaskCreate, employee_id: int):
     db_task = models.Task(**task.dict(), employee_id=employee_id)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
     return db_task
+
+
+def update_task(id: int, db: Session, task: schemas.TaskUpdate):
+    db_task = get_task(db, id)
+    task_data = task.dict(exclude_unset=True)
+    for k, v in task_data.items():
+        setattr(db_task, k, v)
+    db.add(db_task)
+    db.commit()
+    db.refresh(db_task)
+    return task
+
+
+def delete_task(id: int, db: Session):
+    task = get_task(db, id)
+    db.delete(task)
+    db.commit()
+    return task
