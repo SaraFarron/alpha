@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from sqlalchemy import Time
 
 
 class Employee(BaseModel):
@@ -13,6 +14,10 @@ class EmployeeCreate(BaseModel):
 class TaskBase(BaseModel):
     title: str
     description: str | None = None
+    time_to_complete: Time
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class TaskCreate(TaskBase):
@@ -23,6 +28,7 @@ class TaskUpdate(BaseModel):
     employee_id: int
     title: str
     description: str | None = None
+    is_completed: bool = False
 
 
 class Task(TaskBase):

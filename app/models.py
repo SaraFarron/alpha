@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, DateTime, Boolean
 from database import Base
 
 
@@ -9,7 +9,9 @@ class Index:
 class Employee(Base, Index):
     __tablename__ = 'employees'
 
-    name = Column(String)
+    name = Column(String, index=True)
+    date_employed = Column(Date)
+    task_load = Column(Integer, default=0)
 
 
 class Task(Base, Index):
@@ -18,4 +20,6 @@ class Task(Base, Index):
     title = Column(String, index=True)
     description = Column(String, index=True)
     employee_id = Column(Integer, ForeignKey('employees.id'))
-    status = Column(String, default='Open', index=True)
+    is_completed = Column(Boolean, default=False, index=True)
+    time_to_complete = Column(Time)
+    datetime_received = Column(DateTime)

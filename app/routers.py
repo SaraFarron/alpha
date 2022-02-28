@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import time
 from database import SessionLocal
 import crud
 import schemas
@@ -52,9 +53,9 @@ async def destroy_employee(employee_id: int, db: Session = Depends(get_db)):
 
 @router.post("/employees/{employee_id}/task/", response_model=schemas.Task, tags=['tasks'])
 async def create_task_for_employee(
-    employee_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db)
+    employee_id: int, time_to_complete: time, task: schemas.TaskCreate, db: Session = Depends(get_db)
 ):
-    return crud.create_employee_task(db=db, task=task, employee_id=employee_id)
+    return crud.create_employee_task(db=db, task=task, employee_id=employee_id, time_to_complete=time_to_complete)
 
 
 @router.get("/tasks/", response_model=list[schemas.Task], tags=['tasks'])
