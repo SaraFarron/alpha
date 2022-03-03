@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import Time
+from datetime import time
 
 
 class Employee(BaseModel):
@@ -14,7 +14,7 @@ class EmployeeCreate(BaseModel):
 class TaskBase(BaseModel):
     title: str
     description: str | None = None
-    time_to_complete: Time
+    time_to_complete: time
 
     class Config:
         arbitrary_types_allowed = True
