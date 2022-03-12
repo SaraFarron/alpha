@@ -35,7 +35,7 @@ async def read_employee(employee_id: int, db: Session = Depends(get_db)):
         raise HTTPException(404)
 
 
-@router.post('/employees', tags=['employees'], response_model=schemas.Employee)
+@router.post('/employees', tags=['employees'], response_model=schemas.Employee, status_code=201)
 async def create_employee(employee: schemas.EmployeeCreate, db: Session = Depends(get_db)) -> schemas.Employee:
     db_employee = crud.get_employee_by_name(db, employee.name)
     if db_employee:
@@ -51,7 +51,7 @@ async def destroy_employee(employee_id: int, db: Session = Depends(get_db)):
     return crud.delete_employee(db, employee_id)
 
 
-@router.post("/employees/{employee_id}/task/", response_model=schemas.Task, tags=['tasks'])
+@router.post("/employees/{employee_id}/task/", response_model=schemas.Task, tags=['tasks'], status_code=201)
 async def create_task_for_employee(
     employee_id: int, time_to_complete: time, task: schemas.TaskCreate, db: Session = Depends(get_db)
 ):
@@ -74,6 +74,6 @@ async def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depe
     return crud.update_task(task_id, db, task)
 
 
-@router.delete('/tasks/{task_id}', tags=['tasks'])
+@router.delete('/tasks/{task_id}', tags=['tasks'], status_code=204)
 async def destroy_task(task_id: int, db: Session = Depends(get_db)):
     return crud.delete_task(task_id, db)

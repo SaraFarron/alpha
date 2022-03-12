@@ -1,8 +1,21 @@
 from fastapi.testclient import TestClient
 from .main import app
+from .routers import get_db
+from .database import TestingSessionLocal
 
-client = TestClient(app)
 # TODO
+
+
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_db] = override_get_db
+client = TestClient(app)
 
 
 def test_get_employees():
@@ -19,19 +32,19 @@ def test_get_employee():
 
 def test_create_employee():
     response = client.post('/employees')
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json() == {'todo': 'create this'}
 
 
 def test_delete_employees():
     response = client.delete('/employee/{employee_id}')
-    assert response.status_code == 200
+    assert response.status_code == 204
     assert response.json() == {'todo': 'create this'}
 
 
 def test_create_task_for_employee():
     response = client.post('/employees/{employee_id}/task/')
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json() == {'todo': 'create this'}
 
 
@@ -48,12 +61,12 @@ def test_get_task():
 
 
 def test_update_task():
-    response = client.get('/task/{task_id}')
+    response = client.patch('/task/{task_id}')
     assert response.status_code == 200
     assert response.json() == {'todo': 'create this'}
 
 
 def test_destroy_task():
-    response = client.get('/task/{task_id}')
-    assert response.status_code == 200
+    response = client.delete('/task/{task_id}')
+    assert response.status_code == 204
     assert response.json() == {'todo': 'create this'}
