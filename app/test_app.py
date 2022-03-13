@@ -18,28 +18,32 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
+def test_create_employee():
+    response = client.post('/employees',
+                           json={'name': 'test_employee'})
+    assert response.status_code == 201
+    data = response.json()
+    assert 'id' in data
+    assert data['name'] == 'test_employee'
+
+
 def test_get_employees():
     response = client.get('/employees')
     assert response.status_code == 200
-    assert response.json() == {'todo': 'create this'}
+    data = response.json()
+    assert data['todo'] == 'todo'
 
 
 def test_get_employee():
     response = client.get('/employee/{employee_id}')
     assert response.status_code == 200
-    assert response.json() == {'todo': 'create this'}
-
-
-def test_create_employee():
-    response = client.post('/employees')
-    assert response.status_code == 201
-    assert response.json() == {'todo': 'create this'}
+    data = response.json()
+    assert data['todo'] == 'todo'
 
 
 def test_delete_employees():
     response = client.delete('/employee/{employee_id}')
     assert response.status_code == 204
-    assert response.json() == {'todo': 'create this'}
 
 
 def test_create_task_for_employee():
