@@ -51,11 +51,12 @@ async def destroy_employee(employee_id: int, db: Session = Depends(get_db)):
     return crud.delete_employee(db, employee_id)
 
 
-@router.post("/employees/{employee_id}/task/", response_model=schemas.Task, tags=['tasks'], status_code=201)
+@router.post("/employees/{employee_id}/task/", response_model=schemas.Task, tags=['tasks'], status_code=201,
+             description='time format: H:M:S')
 async def create_task_for_employee(
-    employee_id: int, time_to_complete: time, task: schemas.TaskCreate, db: Session = Depends(get_db)
+    employee_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db)
 ):
-    return crud.create_employee_task(db=db, task=task, employee_id=employee_id, time_to_complete=time_to_complete)
+    return crud.create_employee_task(db=db, task=task, employee_id=employee_id)
 
 
 @router.get("/tasks/", response_model=list[schemas.Task], tags=['tasks'])

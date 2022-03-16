@@ -31,7 +31,7 @@ def delete_employee(db: Session, employee_id: int):
         db.delete(db_employee)
         db.commit()
     else:
-        raise HTTPException(404, detail=f'employee with id{employee_id} not found')
+        raise HTTPException(404, detail=f'employee with id {employee_id} not found')
     return
 
 
