@@ -37,3 +37,8 @@ class Task(TaskBase):
 
     class Config:
         orm_mode = True
+
+
+class AuthDetails(BaseModel):
+    username: str
+    password: str

@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal
+from auth import AuthHandler
 import crud
 import schemas
 
 router = APIRouter()
+auth_handler = AuthHandler()
+users = []
 
 
 def get_db():
@@ -77,3 +80,39 @@ async def update_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depe
 @router.delete('/tasks/{task_id}', tags=['tasks'], status_code=204)
 async def destroy_task(task_id: int, db: Session = Depends(get_db)):
     return crud.delete_task(task_id, db)
+
+
+@router.post('/register', status_code=201, tags=['auth'])
+async def register(auth_details: schemas.AuthDetails):
+    if any(x['username'] == auth_details.username for x in users):
+        raise HTTPException(400, 'Username is taken')
+    hashed_password = auth_handler.get_password_hash(auth_details.password)
+    users.append({
+        'username': auth_details.username,
+        'password': hashed_password
+    })
+    return
+
+
+@router.post('/login', tags=['auth'])
+async def login(auth_details: schemas.AuthDetails):
+    user = None
+    for x in users:
+        if x['username'] == auth_details.username:
+            user = x
+            break
+
+    if (user is None) or (not auth_handler.verify_password(auth_details.password, user['password'])):
+        raise HTTPException(401, 'Invalid username or password')
+    token = auth_handler.encode_token(user['username'])
+    return {'token': token}
+
+
+@router.get('/unprotected', tags=['auth'])
+async def unprotected():
+    return {'hello': 'world'}
+
+
+@router.get('/protected', tags=['auth'])
+async def protected(username=Depends(auth_handler.auth_wrapper)):
+    return {'name': username}
