@@ -1,40 +1,61 @@
+from fastapi import Request, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Dict
 import jwt
-from fastapi import HTTPException, Security
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from passlib.context import CryptContext
-from datetime import datetime, timedelta
+import time
+
+JWT_SECRET = "secret"
+JWT_ALGORITHM = "HS256"
 
 
-class AuthHandler:
-    security = HTTPBearer()
-    pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-    secret = 'SECRET'
+def token_response(token: str):
+    return {
+        "access_token": token
+    }
 
-    def get_password_hash(self, password): return self.pwd_context.hash(password)
 
-    def verify_password(self, plain_password, hashed_password):
-        return self.pwd_context.verify(plain_password, hashed_password)
+# function used for signing the JWT string
+def sign_jwt(user_id: str) -> Dict[str, str]:
+    payload = {
+        "user_id": user_id,
+        "expires": time.time() + 600
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-    def encode_token(self, user_id):
-        payload = {
-            'exp': datetime.utcnow() + timedelta(days=0, minutes=5),
-            'ist': datetime.utcnow(),
-            'sub': user_id
-        }
-        return jwt.encode(
-            payload,
-            self.secret,
-            algorithm='HS256',
-        )
+    return token_response(token)
 
-    def decode_token(self, token):
+
+def decode_jwt(token: str) -> dict:
+
+    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    return decoded_token if decoded_token["expires"] >= time.time() else None
+
+
+class JWTBearer(HTTPBearer):
+    def __init__(self, auto_error: bool = True):
+        super(JWTBearer, self).__init__(auto_error=auto_error)
+
+    async def __call__(self, request: Request):
+        credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request)
+        if credentials:
+            if not credentials.scheme == "Bearer":
+                raise HTTPException(status_code=403, detail="Invalid authentication scheme.")
+            if not self.verify_jwt(credentials.credentials):
+                raise HTTPException(status_code=403, detail="Invalid token or expired token.")
+            return credentials.credentials
+        else:
+            raise HTTPException(status_code=403, detail="Invalid authorization code.")
+
+    def verify_jwt(self, jwtoken: str) -> bool:
+        is_token_valid: bool = False
+
         try:
-            payload = jwt.decode(token, self.secret, algorithms=['HS256'])
-            return payload['sub']
+            payload = decode_jwt(jwtoken)
         except jwt.ExpiredSignatureError:
             raise HTTPException(401, 'Signature has expired')
         except jwt.InvalidTokenError as e:
             raise HTTPException(401, 'Invalid token')
 
-    def auth_wrapper(self, auth: HTTPAuthorizationCredentials = Security(security)):
-        return self.decode_token(auth.credentials)
+        if payload:
+            is_token_valid = True
+        return is_token_valid

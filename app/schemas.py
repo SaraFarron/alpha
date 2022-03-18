@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
 from datetime import time
 
 
@@ -39,6 +39,29 @@ class Task(TaskBase):
         orm_mode = True
 
 
-class AuthDetails(BaseModel):
-    username: str
-    password: str
+class UserSchema(BaseModel):
+    fullname: str = Field(...)
+    email: EmailStr = Field(...)
+    password: str = Field(...)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "fullname": "John Doe",
+                "email": "john@x.com",
+                "password": "weakpassword"
+            }
+        }
+
+
+class UserLoginSchema(BaseModel):
+    email: EmailStr = Field(...)
+    password: str = Field(...)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "email": "john@x.com",
+                "password": "weakpassword"
+            }
+        }

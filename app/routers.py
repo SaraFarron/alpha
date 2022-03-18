@@ -1,13 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from auth import AuthHandler
+from auth import JWTBearer, sign_jwt
 import crud
 import schemas
 
 router = APIRouter()
-auth_handler = AuthHandler()
 users = []
+
+
+def check_user(data: schemas.UserLoginSchema):
+    for user in users:
+        if user.email == data.email and user.password == data.password:
+            return True
+    return False
 
 
 def get_db():
@@ -82,37 +88,16 @@ async def destroy_task(task_id: int, db: Session = Depends(get_db)):
     return crud.delete_task(task_id, db)
 
 
-@router.post('/register', status_code=201, tags=['auth'])
-async def register(auth_details: schemas.AuthDetails):
-    if any(x['username'] == auth_details.username for x in users):
-        raise HTTPException(400, 'Username is taken')
-    hashed_password = auth_handler.get_password_hash(auth_details.password)
-    users.append({
-        'username': auth_details.username,
-        'password': hashed_password
-    })
-    return
+@router.post("/user/signup", tags=["user"])
+def create_user(user: schemas.UserSchema = Body(...)):
+    users.append(user)  # replace with db call, making sure to hash the password first
+    return sign_jwt(user.email)
 
 
-@router.post('/login', tags=['auth'])
-async def login(auth_details: schemas.AuthDetails):
-    user = None
-    for x in users:
-        if x['username'] == auth_details.username:
-            user = x
-            break
-
-    if (user is None) or (not auth_handler.verify_password(auth_details.password, user['password'])):
-        raise HTTPException(401, 'Invalid username or password')
-    token = auth_handler.encode_token(user['username'])
-    return {'token': token}
-
-
-@router.get('/unprotected', tags=['auth'])
-async def unprotected():
-    return {'hello': 'world'}
-
-
-@router.get('/protected', tags=['auth'])
-async def protected(username=Depends(auth_handler.auth_wrapper)):
-    return {'name': username}
+@router.post("/user/login", tags=["user"])
+def user_login(user: schemas.UserLoginSchema = Body(...)):
+    if check_user(user):
+        return sign_jwt(user.email)
+    return {
+        "error": "Wrong login details!"
+    }
