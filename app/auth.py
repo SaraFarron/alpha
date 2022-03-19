@@ -1,11 +1,13 @@
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Dict
+from passlib.context import CryptContext
 import jwt
-import time
+from time import time
 
 JWT_SECRET = "secret"
 JWT_ALGORITHM = "HS256"
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 def token_response(token: str):
@@ -18,7 +20,7 @@ def token_response(token: str):
 def sign_jwt(user_id: str) -> Dict[str, str]:
     payload = {
         "user_id": user_id,
-        "expires": time.time() + 600
+        "expires": time() + 600
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -28,7 +30,7 @@ def sign_jwt(user_id: str) -> Dict[str, str]:
 def decode_jwt(token: str) -> dict:
 
     decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    return decoded_token if decoded_token["expires"] >= time.time() else None
+    return decoded_token if decoded_token["expires"] >= time() else None
 
 
 class JWTBearer(HTTPBearer):
@@ -59,3 +61,11 @@ class JWTBearer(HTTPBearer):
         if payload:
             is_token_valid = True
         return is_token_valid
+
+
+class Hasher:
+    @staticmethod
+    def verify_password(plain_password, hashed_password): return pwd_context.verify(plain_password, hashed_password)
+
+    @staticmethod
+    def get_password_hash(password): return pwd_context.hash(password)

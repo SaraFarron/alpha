@@ -1,17 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from psycopg2.errors import UniqueViolation
+
 from database import SessionLocal
-from auth import JWTBearer, sign_jwt
+from auth import JWTBearer, sign_jwt, Hasher
 import crud
 import schemas
 
 router = APIRouter()
-users = []
 
 
 def check_user(data: schemas.UserLoginSchema):
+    users = crud.get_users(SessionLocal())
     for user in users:
-        if user.email == data.email and user.password == data.password:
+        if user.email == data.email and Hasher.verify_password(data.password, user.password):
             return True
     return False
 
@@ -59,8 +62,11 @@ async def destroy_employee(employee_id: int, db: Session = Depends(get_db)):
     return crud.delete_employee(db, employee_id)
 
 
-@router.post("/employees/{employee_id}/task/", response_model=schemas.Task, tags=['tasks'], status_code=201,
-             description='time format: H:M:S')
+@router.post("/employees/{employee_id}/task/",
+             response_model=schemas.Task,
+             tags=['tasks'], status_code=201,
+             description='time format: H:M:S',
+             dependencies=[Depends(JWTBearer())])
 async def create_task_for_employee(
     employee_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db)
 ):
@@ -89,8 +95,12 @@ async def destroy_task(task_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/user/signup", tags=["user"])
-def create_user(user: schemas.UserSchema = Body(...)):
-    users.append(user)  # replace with db call, making sure to hash the password first
+def create_user(db: Session = Depends(get_db), user: schemas.UserSchema = Body(...)):
+    try:
+        crud.new_user(db, user)  # replace with db call, making sure to hash the password first
+    except IntegrityError as e:
+        assert isinstance(e.orig, UniqueViolation)
+        raise HTTPException(403, 'This username or email was already taken')
     return sign_jwt(user.email)
 
 
@@ -98,6 +108,4 @@ def create_user(user: schemas.UserSchema = Body(...)):
 def user_login(user: schemas.UserLoginSchema = Body(...)):
     if check_user(user):
         return sign_jwt(user.email)
-    return {
-        "error": "Wrong login details!"
-    }
+    raise HTTPException(403, 'Login or password is incorrect')

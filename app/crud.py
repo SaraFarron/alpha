@@ -3,6 +3,7 @@ from fastapi import HTTPException
 
 import models
 import schemas
+from auth import Hasher
 
 
 def get_employee(db: Session, employee_id: int):
@@ -76,8 +77,9 @@ def delete_task(id: int, db: Session):
 def get_users(db: Session): return db.query(models.User).all()
 
 
-def new_user(db: Session, user: schemas.UserLoginSchema):
-    db_user = models.User()
+def new_user(db: Session, user: schemas.UserSchema):
+    hashed_password = Hasher.get_password_hash(user.password)
+    db_user = models.User(email=user.email, password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
