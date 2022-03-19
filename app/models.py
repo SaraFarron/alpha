@@ -31,3 +31,4 @@ class User(Base, Index):
     fullname = Column(String, index=True, unique=True)
     email = Column(String, index=True, unique=True)
     password = Column(String)
+    access_level = Column(Integer, index=True, default=1)
