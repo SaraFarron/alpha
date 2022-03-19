@@ -1,8 +1,8 @@
-"""commit message
+"""init psql
 
-Revision ID: 69470d993ef4
+Revision ID: 2f2242671bea
 Revises: 
-Create Date: 2022-03-16 09:49:34.138304
+Create Date: 2022-03-19 08:06:13.595237
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '69470d993ef4'
+revision = '2f2242671bea'
 down_revision = None
 branch_labels = None
 depends_on = None

@@ -23,3 +23,11 @@ class Task(Base, Index):
     is_completed = Column(Boolean, default=False, index=True)
     time_to_complete = Column(Time)
     datetime_received = Column(DateTime)
+
+
+class User(Base, Index):
+    __tablename__ = 'users'
+
+    fullname = Column(String, index=True, unique=True)
+    email = Column(String, index=True, unique=True)
+    password = Column(String)

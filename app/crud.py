@@ -73,12 +73,12 @@ def delete_task(id: int, db: Session):
     return task
 
 
-# def get_users(db: Session): return db.query(models.User).all()
-#
-#
-# def new_user(db: Session, user: schemas.UserCreate):
-#     db_user = models.Employee(name=user.name, password=user.password)
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
+def get_users(db: Session): return db.query(models.User).all()
+
+
+def new_user(db: Session, user: schemas.UserLoginSchema):
+    db_user = models.User()
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
