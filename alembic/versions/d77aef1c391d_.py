@@ -1,8 +1,8 @@
-"""init psql
+"""empty message
 
-Revision ID: 2f2242671bea
+Revision ID: d77aef1c391d
 Revises: 
-Create Date: 2022-03-19 08:06:13.595237
+Create Date: 2022-07-20 16:54:01.623647
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2f2242671bea'
+revision = 'd77aef1c391d'
 down_revision = None
 branch_labels = None
 depends_on = None
