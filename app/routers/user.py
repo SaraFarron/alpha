@@ -36,3 +36,8 @@ async def login(user: schemas.UserLoginSchema = Body(...)):
     if check_user(user):
         return sign_jwt(user.email)
     raise HTTPException(403, 'Login or password is incorrect')
+
+
+@router.get('')
+async def all_users(db: Session = Depends(get_db)):
+    return get_users(db)
