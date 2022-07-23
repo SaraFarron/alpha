@@ -37,6 +37,8 @@ last there are directors, who have access to all endpoints and can fire and hire
 
 [alembic tutorial](https://www.youtube.com/watch?v=SdcH6IEi6nE)
 
+[testing](https://fastapi.tiangolo.com/tutorial/testing/)
+
 ### Alembic commands:
 
 Init
