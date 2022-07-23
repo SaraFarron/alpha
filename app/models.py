@@ -1,34 +1,35 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, DateTime, Boolean
+from sqlalchemy import (
+    Column, Integer, String, ForeignKey,
+    Date, Time, DateTime, Boolean, Float
+)
+from datetime import datetime
 from database import Base
 
 
-class Index:
-    id = Column(Integer, primary_key=True, index=True)
-
-
-class Employee(Base, Index):
-    __tablename__ = 'employees'
-
-    name = Column(String, index=True)
-    date_employed = Column(Date)
-    task_load = Column(Integer, default=0)
-
-
-class Task(Base, Index):
+class Task(Base):
     __tablename__ = 'tasks'
 
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    employee_id = Column(Integer, ForeignKey('employees.id'))
-    is_completed = Column(Boolean, default=False, index=True)
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String)
+    description = Column(String)
+    price = Column(Float, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    is_completed = Column(Boolean, default=False)
     time_to_complete = Column(Time)
-    datetime_received = Column(DateTime)
+    datetime_received = Column(DateTime, default=datetime.utcnow)
+    datetime_completed = Column(DateTime)
 
 
-class User(Base, Index):
+class User(Base):
     __tablename__ = 'users'
 
-    fullname = Column(String, index=True, unique=True)
-    email = Column(String, index=True, unique=True)
-    password = Column(String)
-    access_level = Column(Integer, index=True, default=1)
+    id = Column(Integer, primary_key=True, index=True)
+    fullname = Column(String, index=True)
+    email = Column(String, index=True)
+    password = Column(String, nullable=False)
+    date_employed = Column(Date, nullable=False)
+    access_level = Column(Integer, default=1, nullable=False)
+    task_load = Column(Integer, default=0)
+    success_ratio = Column(Float)
+    score = Column(Integer, default=100)
+
