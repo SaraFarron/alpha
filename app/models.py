@@ -27,7 +27,7 @@ class User(Base):
     fullname = Column(String, index=True)
     email = Column(String, index=True)
     password = Column(String, nullable=False)
-    date_employed = Column(Date, nullable=False)
+    date_employed = Column(Date, nullable=False, default=datetime.utcnow().date)
     access_level = Column(Integer, default=1, nullable=False)
     task_load = Column(Integer, default=0)
     success_ratio = Column(Float)
