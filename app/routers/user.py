@@ -27,8 +27,10 @@ def check_user(data: schemas.UserLoginSchema):
 
 @router.post('/signup/')
 async def signup(db: Session = Depends(get_db), user: schemas.UserSchema = Body(...)):
+    hashed_password = Hasher.get_password_hash(user.password)
+    user.password = hashed_password
     try:
-        create_enrty(db, models.User, user)
+        create_enrty(db, models.User, user.dict())
     except IntegrityError as e:
         assert isinstance(e.orig, UniqueViolation)
         raise HTTPException(403, 'This username or email was already taken')

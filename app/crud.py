@@ -2,8 +2,6 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
 import models
-import schemas
-from auth import Hasher
 
 
 def get_all(db: Session, model: models.Base):
