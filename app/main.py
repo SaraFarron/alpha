@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
 from database import engine
-from routers import management, tasks, user
+from routers import tasks, user
 from models import Base
 
 description = """
@@ -39,7 +39,6 @@ app = FastAPI(
         'url': 'https://unlicense.org/'
     }
 )
-app.include_router(management.router)
 app.include_router(tasks.router)
 app.include_router(user.router)
 
