@@ -5,8 +5,7 @@ from psycopg2.errors import UniqueViolation
 from database import get_db, SessionLocal
 from auth import sign_jwt, Hasher
 from crud import (
-    get_all, get_concrete, create_enrty,
-    update_enrty, delete_entry, Session
+    get_all, create_entry, Session,
 )
 import schemas
 import models
@@ -30,7 +29,7 @@ async def signup(db: Session = Depends(get_db), user: schemas.UserSchema = Body(
     hashed_password = Hasher.get_password_hash(user.password)
     user.password = hashed_password
     try:
-        create_enrty(db, models.User, user.dict())
+        create_entry(db, models.User, user.dict())
     except IntegrityError as e:
         assert isinstance(e.orig, UniqueViolation)
         raise HTTPException(403, 'This username or email was already taken')

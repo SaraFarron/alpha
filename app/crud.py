@@ -12,17 +12,18 @@ def get_concrete(db: Session, model: models.Base, hallmark: dict, many: bool = F
     result = db.query(model).filter_by(**hallmark)
     return result.all() if many else result.first()
 
-def create_enrty(db: Session, model: models.Base, data: dict):
+def create_entry(db: Session, model: models.Base, data: dict):
     db_model = model(**data)
     db.add(db_model)
     db.commit()
     db.refresh(db_model)
     return db_model
 
-def update_enrty(db: Session, model: models.Base, model_id, data: dict):
+def update_entry(db: Session, model: models.Base, model_id, data: dict):
     db_model = get_concrete(db, model, {'id': model_id})
     for k, v in data.items():
-        setattr(db_model, k, v)
+        if v:
+            setattr(db_model, k, v)
     db.add(db_model)
     db.commit()
     db.refresh(db_model)

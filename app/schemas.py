@@ -15,6 +15,7 @@ class TaskBase(BaseModel):
     title: str
     description: str | None = None
     time_to_complete: time
+    price: float
 
     class Config:
         arbitrary_types_allowed = True
@@ -25,15 +26,16 @@ class TaskCreate(TaskBase):
 
 
 class TaskUpdate(BaseModel):
-    employee_id: int
-    title: str
+    user_id: int | None = None
+    title: str | None = None
     description: str | None = None
-    is_completed: bool = False
+    is_completed: bool | None = None
+    price: float | None = None
 
 
 class Task(TaskBase):
     id: int
-    employee_id: int
+    user_id: int
 
     class Config:
         orm_mode = True
