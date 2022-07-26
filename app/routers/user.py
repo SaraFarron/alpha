@@ -24,7 +24,7 @@ def check_user(data: schemas.UserLoginSchema):
     return False
 
 
-@router.post('/signup/')
+@router.post('/signup/', response_model=schemas.AccessToken)
 async def signup(db: Session = Depends(get_db), user: schemas.UserSchema = Body(...)):
     hashed_password = Hasher.get_password_hash(user.password)
     user.password = hashed_password
@@ -36,13 +36,13 @@ async def signup(db: Session = Depends(get_db), user: schemas.UserSchema = Body(
     return sign_jwt(user.email)
 
 
-@router.post('/login/')
+@router.post('/login/', response_model=schemas.AccessToken)
 async def login(user: schemas.UserLoginSchema = Body(...)):
     if check_user(user):
         return sign_jwt(user.email)
     raise HTTPException(403, 'Login or password is incorrect')
 
 
-@router.get('')
+@router.get('/', response_model=list[schemas.UserResponse])
 async def all_users(db: Session = Depends(get_db)):
     return get_all(db, models.User)
