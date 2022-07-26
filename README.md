@@ -60,3 +60,7 @@ Migrate to previous
 ### Testing
 
 `docker exec -it alpha_web_1 pytest`
+
+### TODO
+* add 404 handlers
+* if task is_completed = True, then datetime_completed must not be null

@@ -14,8 +14,8 @@ class Task(Base):
     description = Column(String)
     price = Column(Float, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
-    is_completed = Column(Boolean, default=False)
-    time_to_complete = Column(Time)
+    is_completed = Column(Boolean, default=False, nullable=False)
+    time_to_complete = Column(Time, nullable=False)
     datetime_received = Column(DateTime, default=datetime.utcnow)
     datetime_completed = Column(DateTime)
 
