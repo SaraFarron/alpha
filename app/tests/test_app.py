@@ -13,12 +13,15 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
 
-
 TASK_PAYLOAD = {
-
+    'title': 'test title',
+    'description': 'test description',
+    'price': 100,
+    'time_to_complete': '01:30:00',
 }
 USER_PAYLOAD = {
-
+    'email': 'test@user.com',
+    'password': 'testpassword',
 }
 
 
@@ -34,35 +37,73 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
+def register():
+    payload = {
+        'fullname': 'Test User',
+        'email': 'test@user.com',
+        'password': 'testpassword',
+    }
+    response = client.post('user/signup/', json=payload)
+    return response
+
+
+def test_new_user():
+    response = register()
+    assert response.status_code == 200
+    assert response.json()['access_token']
+
+
+def test_login():
+    payload = USER_PAYLOAD
+    response = client.post('user/login/', json=payload)
+    assert response.status_code == 200
+    access_token = response.json()['access_token']
+    assert access_token
+    USER_PAYLOAD['access_token'] = access_token
+
+
 def test_create_task_for_user():
-    response = client.post('/tasks/', json={'title': 'test_task', 'description': 'test_desc', 'time_to_complete': '00:10:00'})
-    assert response.status_code == 201
+    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    payload = TASK_PAYLOAD
+    response = client.post(
+        '/tasks/',
+        json=payload,
+        headers=auth,
+    )
+    assert response.status_code == 201, f'{response.text}'
     data = response.json()
-    assert data['title'] == 'test_task'
+    assert data['title'] == 'test title'
 
 
 def test_get_tasks():
-    response = client.get('/tasks')
-    assert response.status_code == 200
+    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    response = client.get('/tasks/', headers=auth)
+    assert response.status_code == 200, f'{response.text}'
     data = response.json()
-    assert data == {'todo': 'create this'}
+    assert data == [TASK_PAYLOAD, ]
 
 
 def test_get_task():
-    response = client.get('/tasks/1')
-    assert response.status_code == 200
+    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    response = client.get('/tasks/1/', headers=auth)
+    assert response.status_code == 200, f'{response.text}'
     data = response.json()
-    assert data['title'] == 'test_task'
+    assert data == TASK_PAYLOAD
 
 
 def test_update_task():
-    response = client.patch('/tasks/1',
-                            json={'is_completed': 'True'})
-    assert response.status_code == 200
+    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    response = client.patch(
+        '/tasks/1/',
+        json={'description': 'update test'},
+        headers=auth,
+    )
+    assert response.status_code == 200, f'{response.text}\n{response.request.headers}'
     data = response.json()
-    assert data['is_completed'] == 'True'
+    assert data['description'] == 'update test'
 
 
 def test_destroy_task():
-    response = client.delete('/tasks/1')
-    assert response.status_code == 204
+    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    response = client.delete('/tasks/1/', headers=auth)
+    assert response.status_code == 204, f'{response.text}'

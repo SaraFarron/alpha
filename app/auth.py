@@ -43,7 +43,6 @@ class JWTBearer(HTTPBearer):
             if not credentials.scheme == "Bearer":
                 raise HTTPException(status_code=403, detail="Invalid authentication scheme.")
             if not self.verify_jwt(credentials.credentials):
-                # TODO make expired and invalid token errors separated
                 raise HTTPException(status_code=403, detail="Invalid token or expired token.")
             return credentials.credentials
         else:
@@ -66,7 +65,8 @@ class JWTBearer(HTTPBearer):
 
 class Hasher:
     @staticmethod
-    def verify_password(plain_password, hashed_password): return pwd_context.verify(plain_password, hashed_password)
+    def verify_password(plain_password, hashed_password):
+        return pwd_context.verify(plain_password, hashed_password)
 
     @staticmethod
     def get_password_hash(password): return pwd_context.hash(password)

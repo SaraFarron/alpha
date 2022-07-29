@@ -5,8 +5,8 @@ from datetime import time, datetime, date
 class TaskBase(BaseModel):
     title: str
     description: str | None
-    time_to_complete: time
     price: float
+    time_to_complete: time
 
     class Config:
         arbitrary_types_allowed = True
@@ -87,6 +87,18 @@ class UserResponse(UserBase):
 
     class Config:
         orm_mode = True
+        schema_extra = {
+            "example": {
+                "id": 1,
+                "fullname": "username",
+                "email": "example@test.com",
+                "date_employed": "2022-07-25 13:52:29.392925",
+                "access_level": 1,
+                "task_load": 10,
+                "success_ration": 50.1,
+                "score": 100,
+            }
+        }
 
 
 class UserUpdate(BaseModel):

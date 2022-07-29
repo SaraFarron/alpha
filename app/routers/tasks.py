@@ -38,11 +38,11 @@ async def new_task(user_id: int, task: schemas.TaskCreate, db: Session = Depends
     return create_entry(db, models.Task, task)
 
 
-@router.patch('/update/{task_id}/', response_model=schemas.TaskUpdate)
+@router.patch('/{task_id}/', response_model=schemas.TaskUpdate)
 async def edit_task(task_id: int, task: schemas.TaskUpdate, db: Session = Depends(get_db)):
     return update_entry(db, models.Task, task_id, task.dict()).__dict__  # pydantic wants dictionary
 
 
-@router.delete('/remove/{task_id}/', status_code=204)
+@router.delete('/{task_id}/', status_code=204)
 async def remove_task(task_id: int, db: Session = Depends(get_db)):
     return delete_entry(db, models.Task, task_id)
