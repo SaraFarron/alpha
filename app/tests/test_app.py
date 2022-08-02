@@ -19,6 +19,15 @@ TASK_PAYLOAD = {
     'price': 100,
     'time_to_complete': '01:30:00',
 }
+TASK_RESPONSE = {
+    "id": 1,
+    "title": "test title",
+    "description": "test description",
+    "price": 100,
+    "user_id": 1,
+    "is_completed": False,
+    "time_to_complete": "01:30:00",
+}
 USER_PAYLOAD = {
     'email': 'test@user.com',
     'password': 'testpassword',
@@ -63,12 +72,14 @@ def test_login():
 
 
 def test_create_task_for_user():
-    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     payload = TASK_PAYLOAD
+    params = {'user_id': 1}
     response = client.post(
         '/tasks/',
         json=payload,
         headers=auth,
+        params=params,
     )
     assert response.status_code == 201, f'{response.text}'
     data = response.json()
@@ -76,23 +87,25 @@ def test_create_task_for_user():
 
 
 def test_get_tasks():
-    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.get('/tasks/', headers=auth)
     assert response.status_code == 200, f'{response.text}'
     data = response.json()
-    assert data == [TASK_PAYLOAD, ]
+    del data['datetime_received']
+    del data['datetime_completed']
+    assert data == [TASK_RESPONSE, ]
 
 
 def test_get_task():
-    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.get('/tasks/1/', headers=auth)
     assert response.status_code == 200, f'{response.text}'
     data = response.json()
-    assert data == TASK_PAYLOAD
+    assert data == TASK_RESPONSE
 
 
 def test_update_task():
-    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.patch(
         '/tasks/1/',
         json={'description': 'update test'},
@@ -104,6 +117,6 @@ def test_update_task():
 
 
 def test_destroy_task():
-    auth = {'Authorization:': 'Bearer ' + USER_PAYLOAD['access_token']}
+    auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.delete('/tasks/1/', headers=auth)
     assert response.status_code == 204, f'{response.text}'

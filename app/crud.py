@@ -10,6 +10,8 @@ def get_all(db: Session, model: models.Base):
 
 def get_concrete(db: Session, model: models.Base, hallmark: dict, many: bool = False):
     result = db.query(model).filter_by(**hallmark)
+    if not result:
+        raise HTTPException(404, 'Object not found')
     return result.all() if many else result.first()
 
 def create_entry(db: Session, model: models.Base, data: dict):
