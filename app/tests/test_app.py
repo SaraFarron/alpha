@@ -1,10 +1,3 @@
-import pytest
-from fastapi.testclient import TestClient
-from os import environ
-
-from ..database import test_db, get_db
-from ..main import app
-
 TASK_PAYLOAD = {
     'title': 'test title',
     'description': 'test description',
@@ -26,15 +19,7 @@ USER_PAYLOAD = {
 }
 
 
-@pytest.fixture(scope='session')
-def client():
-    app.dependency_overrides[get_db] = test_db()
-    client = TestClient(app)
-    yield client
-    environ['DATABASE_URL'] = 'postgresql://postgres:postgres@db/postgres'
-
-
-def register():
+def register(client):
     payload = {
         'fullname': 'Test User',
         'email': 'test@user.com',
@@ -44,13 +29,13 @@ def register():
     return response
 
 
-def test_new_user():
-    response = register()
+def test_new_user(client):
+    response = register(client)
     assert response.status_code == 200
     assert response.json()['access_token']
 
 
-def test_login():
+def test_login(client):
     payload = USER_PAYLOAD
     response = client.post('user/login/', json=payload)
     assert response.status_code == 200
@@ -59,7 +44,7 @@ def test_login():
     USER_PAYLOAD['access_token'] = access_token
 
 
-def test_create_task_for_user():
+def test_create_task_for_user(client):
     auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     payload = TASK_PAYLOAD
     params = {'user_id': 1}
@@ -74,7 +59,7 @@ def test_create_task_for_user():
     assert data['title'] == 'test title'
 
 
-def test_get_tasks():
+def test_get_tasks(client):
     auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.get('/tasks/', headers=auth)
     assert response.status_code == 200, f'{response.text}'
@@ -84,7 +69,7 @@ def test_get_tasks():
     assert data == [TASK_RESPONSE, ]
 
 
-def test_get_task():
+def test_get_task(client):
     auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.get('/tasks/1/', headers=auth)
     assert response.status_code == 200, f'{response.text}'
@@ -92,7 +77,7 @@ def test_get_task():
     assert data == TASK_RESPONSE
 
 
-def test_update_task():
+def test_update_task(client):
     auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.patch(
         '/tasks/1/',
@@ -104,7 +89,7 @@ def test_update_task():
     assert data['description'] == 'update test'
 
 
-def test_destroy_task():
+def test_destroy_task(client):
     auth = {'Authorization': 'Bearer ' + USER_PAYLOAD['access_token']}
     response = client.delete('/tasks/1/', headers=auth)
     assert response.status_code == 204, f'{response.text}'

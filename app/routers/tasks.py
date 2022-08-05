@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from database import get_db
-from auth import JWTBearer
-from crud import (
+from app import schemas
+from app import models
+from app.database import get_db
+from app.auth import JWTBearer
+from app.crud import (
     get_all, get_concrete, update_entry,
     create_entry, delete_entry,
 )
-import schemas
-import models
 
 router = APIRouter(
     prefix='/tasks',

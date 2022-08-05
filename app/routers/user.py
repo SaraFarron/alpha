@@ -2,13 +2,13 @@ from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
-from database import get_db, SessionLocal
-from auth import sign_jwt, Hasher
-from crud import (
+from app.database import get_db, SessionLocal
+from app.auth import sign_jwt, Hasher
+from app.crud import (
     get_all, create_entry, Session,
 )
-import schemas
-import models
+from app import schemas
+from app import models
 
 router = APIRouter(
     prefix='/user',

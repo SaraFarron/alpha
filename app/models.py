@@ -3,11 +3,13 @@ from sqlalchemy import (
     Date, Time, DateTime, Boolean, Float
 )
 from datetime import datetime
-from database import Base
+
+from app.database import Base
 
 
 class Task(Base):
     __tablename__ = 'tasks'
+    __table_args__ = {'extend_existing': True}
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
@@ -22,6 +24,7 @@ class Task(Base):
 
 class User(Base):
     __tablename__ = 'users'
+    __table_args__ = {'extend_existing': True}
 
     id = Column(Integer, primary_key=True, index=True)
     fullname = Column(String, index=True)

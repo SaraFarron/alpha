@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
-from database import engine
-from routers import tasks, user
-from models import Base
+from app.database import engine
+from app.routers import tasks, user
+from app.models import Base
 
 description = """
 Alpha application is my first project using FastAPI. This application is some kind of management tool of
